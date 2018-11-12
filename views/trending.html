@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset='utf-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1, shrink-to-fit=no'>
+		<link rel='stylesheet' href='https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css' integrity='sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO' crossorigin='anonymous'>
+		<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'>
+    <link href='https://fonts.googleapis.com/css?family=Orbitron' rel='stylesheet'>
+		<link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.2.0/css/all.css' integrity='sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ' crossorigin='anonymous'>
+	</head>
+
+	<body>
+		<style>
+    body, html {
+      background-color: #e9ebee;
+    }
+			nav.navbar.navbar-expand-lg.navbar-light.bg-light {
+			    background-color: #00aced !important;
+					font-weight: 700;
+			}
+      .navbar-light .navbar-brand:focus, .navbar-light .navbar-brand {
+        color: #f2f2f2;
+      }
+			a.nav-link {
+			    color: #f2f2f2 !important;
+			    padding-left: 35px !important;
+			}
+			a.nav-link:hover{
+				color:#f7f9f9 !important;
+			}
+			a.navbar-brand {
+				padding-left: 75px;
+			}
+
+			h6 {
+				margin-top: 25px;
+				margin-bottom: 10px;
+				font-size: 0.7em;
+				font-family: sans-serif;
+			}
+
+			.listingResult {
+				margin-top: -1px;
+				border: 1px solid #dddfe2;
+				padding-top: 10px;
+				padding-bottom: 1px;
+				background-color: #fff;
+			}
+			.listingResult h5 {
+				font-size: 0.8em;
+				font-weight: 700;
+				font-family: sans-serif;
+			}
+			.listingResult img {
+				height: 25px;
+				width: 25px;
+				margin-top: -4px;
+				border: 1px solid #dddfe2;
+			}
+			.listingResult h4 {
+				font-size: 0.8em;
+				font-family: sans-serif;
+			}
+			.listingResult #buy {
+				float: right;
+				background-color: #00aced;
+				color: #f2f2f2;
+				padding: 3px 8px;
+				font-weight: 700;
+				margin-top: -3px;
+			}
+
+			footer {
+				margin-top: 20px;
+				margin-bottom: 10px;
+			}
+			footer p {
+				margin-top: 0px;
+				float: left;
+			}
+			footer p a {
+				margin-right: 10px;
+				font-size: 0.6em;
+				color: black;
+			}
+			footer #madeInNZ {
+				color: black;
+				float: right;
+				font-size: 0.6em;
+			}
+	</style>
+
+
+		<nav class="navbar navbar-expand-lg navbar-light bg-light">
+		  <a class="navbar-brand" href="#">Bookla</a>
+		  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="true" aria-label="Toggle navigation">
+		    <span class="navbar-toggler-icon"></span>
+		  </button>
+	    <div class="navbar-collapse w-100 order-3 dual-collapse collapse show in" id="navbarText" style="" aria-expanded="true">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+              <a class="nav-link" href="/"><i class="fas fa-home"></i> Home</a>
+          </li>
+          <li class="nav-item">
+              <a class="nav-link" href="/trending"><i class="fas fa-heart"></i> Trending</a>
+          </li>
+					<% if (user) { %>
+						<li class="nav-item">
+	              <a class="nav-link" href="/notifications"><i class="fas fa-list"></i> Notifications</a>
+	          </li>
+	          <li class="nav-item">
+	              <a class="nav-link" href="/profile/<%- user.username %>"><div id='userAccount'></div></a>
+	          </li>
+					<% } else { %>
+						<li class="nav-item">
+								<a class="nav-link" href="/register">Register</a>
+						</li>
+						<li class="nav-item">
+								<a class="nav-link" href="/sign-in">Sign In</a>
+						</li>
+					<% } %>
+        </ul>
+		  </div>
+		</nav>
+
+		<div class="container">
+			<div class="row">
+				<div class='col-lg-3'>
+				</div>
+				<div class='col-sm-12 col-lg-6'>
+					<h6>
+						Trending
+					</h6>
+					<div class='listingResult'>
+						<div class="container">
+							<div class="row">
+								<div class='col-sm-1 col-lg-1'>
+									<h5>
+										#1
+									</h5>
+								</div>
+								<div class='col-sm-1 col-lg-1'>
+									<img src='' />
+								</div>
+								<div class='col-sm-10 col-lg-10'>
+									<h4>
+										gay niggers from outer space
+										<u>
+											Ben Tim
+										</u>
+										<div id='buy'>
+											 <i class="fas fa-shopping-cart"></i> BUY
+										</div>
+									</h4>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class='listingResult'>
+						<div class="container">
+							<div class="row">
+								<div class='col-sm-1 col-lg-1'>
+									<h5>
+										#2
+									</h5>
+								</div>
+								<div class='col-sm-1 col-lg-1'>
+									<img src='' />
+								</div>
+								<div class='col-sm-10 col-lg-10'>
+									<h4>
+										gay niggers from outer space
+										<u>
+											Ben Tim
+										</u>
+										<div id='buy'>
+											 <i class="fas fa-shopping-cart"></i> BUY
+										</div>
+									</h4>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class='listingResult'>
+						<div class="container">
+							<div class="row">
+								<div class='col-sm-1 col-lg-1'>
+									<h5>
+										#3
+									</h5>
+								</div>
+								<div class='col-sm-1 col-lg-1'>
+									<img src='' />
+								</div>
+								<div class='col-sm-10 col-lg-10'>
+									<h4>
+										gay niggers from outer space
+										<u>
+											Ben Tim
+										</u>
+										<div id='buy'>
+											 <i class="fas fa-shopping-cart"></i> BUY
+										</div>
+									</h4>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

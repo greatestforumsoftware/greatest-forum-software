@@ -1,0 +1,87 @@
+html, body {
+	width: 100%;
+	padding: 0px 0px;
+	margin: 0px 0px;
+	background-color: #fafafa;;
+}
+
+header {
+	width: 100%;
+	border-bottom: 1px solid #ebebeb;
+	padding-bottom: 25px;
+	background-color: #fff;
+}
+header #logo {
+	width: 175px;
+	height: 50px;
+	background-color: black;
+	margin-top: 25px;
+}
+header .nav {
+	margin-top: 32px;
+	font-size: 0.8em;
+	color: #303541;
+}
+header .nav .nav-item a {
+	color: #303541;
+	display: text;
+}
+header .nav .nav-item a:hover {
+	border-bottom: 3px solid #303541;
+	margin: 0px auto;
+}
+header .nav #register {
+	border: 1px solid #303541;
+	border-radius: 5px;
+	margin-top: -1px;
+}
+
+.breadcrumb {
+	background-color: #fafafa;
+	margin-left: -15px;
+	margin-bottom: 5px;
+}
+
+
+/* BLOG */
+
+#blogIndex {
+	width: 100%;
+	padding-top: 15px;
+	padding-bottom: 15px;
+	border-bottom: 1px solid #ddd;
+	box-shadow: 0 1px 2px 0 rgba(0,0,0,0.2);
+	background-color: #fff;
+}
+#blogIndex #blogImage {
+	width: 100%;
+	height: 100px;
+	border: 1px solid #ddd;
+}
+#blogIndex #blogDetails {
+	font-size: 0.7em;
+	color: darkgrey;
+}
+#blogIndex #blog {
+	padding-bottom: 10px;
+	width: 100%;
+	border-bottom: 1px solid #ddd;
+}
+#blogIndex #blog h4 {
+	font-weight: 700;
+	color: #303541;
+}
+
+aside {
+	background-color: #fff;
+	width: 100%;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	border: 1px solid #ebebeb;
+	border-radius: 3px;
+	box-shadow: 0 1px 2px 0 rgba(0,0,0,0.2);
+}
+aside h6 {
+	font-weight: 700;
+	font-width: 100%;
+}
