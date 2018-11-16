@@ -56,6 +56,7 @@ module.exports = function(app, passport) {
 	app.get('/user/tags/following', isLoggedIn, user.tagsFollowing);
 
 	app.get('/api/:username/user/brief', user.userBrief);
+	app.get('/api/:username/referral', user.referral);
 
 	app.get('/user/:username/activity', user.userActivity);
 
@@ -89,6 +90,7 @@ module.exports = function(app, passport) {
 
 	app.get('/post/:authorID/brief', Author.postBriefInfo);
 	app.get('/post/:authorID/info', Author.postInfo);
+	app.get('/post/:authorID/tags', Author.postTags);
 	app.get('/post/:authorID/commentscount', Author.commentsCount);
 	app.get('/post/:authorID/fullcontent', Author.fullContent);
 
@@ -119,6 +121,11 @@ module.exports = function(app, passport) {
 	app.get('/tag/:name/unfollow', isLoggedIn, Timeline.unfollowTag);
 	app.get('/api/:name/tags', isLoggedIn, Timeline.tags);
 	app.get('/tag/:name/status', isLoggedIn, Timeline.tagStatus);
+	app.get('/api/:name/posts', Timeline.tagPosts);
+
+	app.get('/tags/:name', Timeline.tagsSearch);
+
+	app.get('/api/tags/recent', Timeline.recentTags);
 
 	app.get('/api/new', Timeline.allNew);
 	app.get('/api/best', Timeline.allBest);

@@ -10,7 +10,7 @@ var Tags = require('../db/tags');
 var sanitize = require('strip-js');
 
 exports.search = function(req, res) {
-  var query = sanitize(req.params.query).replace(/[^a-z0-9 \?\!\.\,\'\"\`\-]/gi,'');
+  var query = sanitize(req.params.query).replace(/[^a-z0-9 ? ! . , ' " ` -]/gi,'');
   if(query) {
     var Author = mongoose.model('Author');
     Author.find({'title': new RegExp(query)}).limit(10).select('_id title username upvote downvote date').exec(function(err, result) {
@@ -26,7 +26,8 @@ exports.search = function(req, res) {
 }
 
 exports.people = function(req, res) {
-  var query = sanitize(req.params.query).replace(/[^a-z0-9 \?\!\.\,\'\"\`\-]/gi,'');
+  var query = sanitize(req.params.query).replace(!/^[a-zA-Z0-9\,\.\-\'\"\`\!\? ]+$/,'');
+  console.log(query);
   if(query) {
     var User = mongoose.model('User');
     User.find({'username': new RegExp(query)}).limit(10).select('_id username biography xp created').exec(function(err, result) {
@@ -42,7 +43,7 @@ exports.people = function(req, res) {
 }
 
 exports.page = function(req, res) {
-  var query = sanitize(req.query.query).replace(/[^a-z0-9 \?\!\.\,\'\"\`\-]/gi,'');
+  var query = sanitize(req.query.query).replace(/[^a-z0-9 \#\?\!\.\,\'\"\`\-]/gi,'');
   if(query) {
     res.render('search', {
       title: '',

@@ -55,7 +55,7 @@ exports.tags = function(req, res) {
   var tagName = sanitize(req.params.name).replace(/[^a-z0-9]/gi,'');
   if(tagName.length < 30 && tagName.length > 3) {
     var Tags = mongoose.model('Tags');
-    Tags.findOne({'tagName': tagName}).exec(function(err, tagResult) {
+    Tags.find({'tagName': tagName}).limit(25).exec(function(err, tagResult) {
       res.send(tagResult);
     });
   } else {
@@ -79,6 +79,35 @@ exports.tagStatus = function(req, res) {
   }
 }
 
+exports.tagPosts = function(req, res) {
+  var tagName = sanitize(req.params.name).replace(/[^a-z0-9]/gi,'');
+  if(tagName.length <= 30 && tagName.length >= 3) {
+    var Tags = mongoose.model('Tags');
+    Tags.find({'tagName': tagName}).limit(25).exec(function(err, tagResult) {
+      if(err || tagResult == '' || tagResult == '[]' || tagResult == '{}' || tagResult == null) {
+        res.send('no tags');
+      } else {
+        res.send(tagResult);
+      }
+    });
+  } else {
+    res.send('no tags');
+  }
+}
+
+exports.tagsSearch = function(req, res) {
+  var query = sanitize(req.params.name).replace(/[^a-z0-9 \#\?\!\.\,\'\"\`\-]/gi,'');
+  if(query) {
+    res.render('tags', {
+      title: '',
+      user: req.user,
+      tags: query
+    });
+  } else {
+    res.send('no result');
+  }
+}
+
 exports.getTimeline = function(req, res) {
   var Author = mongoose.model('Author');
   Author.find().select('_id username date').sort({'date': 1}).exec(function(err, authorResult) {
@@ -92,7 +121,7 @@ exports.getTimeline = function(req, res) {
 
 exports.allNew = function(req, res) {
   var Author = mongoose.model('Author');
-  Author.find().select('_id username date').limit(15).sort({'date': 1}).exec(function(err, results) {
+  Author.find().select('_id username date').limit(15).sort({'date': -1}).exec(function(err, results) {
     if(err) {
       res.redirect('/404');
     } else {
@@ -119,6 +148,17 @@ exports.allTrending = function(req, res) {
       res.redirect('/404');
     } else {
       res.send(results);
+    }
+  });
+}
+
+exports.recentTags = function(req, res) {
+  var Tags = mongoose.model('Tags');
+  Tags.find().limit(25).exec(function(err, result) {
+    if(err) {
+      res.send('no result');
+    } else {
+      res.send(result);
     }
   });
 }

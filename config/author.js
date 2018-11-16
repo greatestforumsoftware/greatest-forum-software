@@ -13,8 +13,23 @@ exports.addAuthor = function(req, res) {
 	var xpAmount = 0;
 
 	if(req.user.xp >= xpAmount) {
+		function addTag(tag, postID) {
+			var Tags = mongoose.model('Tags');
+			Tags.findOne({'tagName': tag, 'postID': postID}).exec(function(err, result) {
+				if(err) {
+					return 0;
+				} else if(result == '' || result == '{}' || result == '[]' || result == null) {
+					var newTags = new Tags({'tagName': tag, 'postID': postID});
+					newTags.save();
+					return 1;
+				} else {
+					return 0;
+				}
+			});
+		}
+
 		// this function adds books for user
-		function addAuthor(username, type, title, image, contents, date, edit) {
+		function addAuthor(username, type, title, image, contents, date, edit, tags) {
 			var Author = mongoose.model('Author');
 			var newAuthor = new Author();
 
@@ -32,6 +47,10 @@ exports.addAuthor = function(req, res) {
 				if(err) {
 					return err;
 				} else {
+					var splitTags = tags.split(" ");
+					for (var i = 0; i < splitTags.length; i++) {
+						addTag(splitTags[i], save._id);
+					}
 
 					var User = mongoose.model('User');
 					User.findOne({'username': req.user.username}).exec(function(err, userResult) {
@@ -57,21 +76,6 @@ exports.addAuthor = function(req, res) {
 			});
 		}
 
-		function addTag(tag, postID) {
-			var Tags = mongoose.model('Tags');
-			Tags.findOne({'tagName': tag, 'postID': postID}).exec(function(err, result) {
-				if(err) {
-					return 0;
-				} else if(result == '' || result == '{}' || result == '[]' || result == null) {
-					var newTags = new Tags({'tagName': tag, 'postID': postID});
-					newTags.save();
-					return 1;
-				} else {
-					return 0;
-				}
-			});
-		}
-
 		var title = req.body.title.replace(/[^a-z0-9 \?\!\.\,\'\"\`\-]/gi,'');
 		var content = req.body.content.replace(/[^a-z0-9 \?\!\.\,\'\"\`\-]/gi,'');
 		var tags = req.body.tags.replace(/[^a-z0-9 ]/gi,'');
@@ -82,7 +86,7 @@ exports.addAuthor = function(req, res) {
 			if(!tags || tags.length <= 2 ||tags.length >= 30) {
 				res.send('Tags error. Make sure you have included tags and that they don\'t exceed 30 characters.');
 			} else {
-				addAuthor(req.user.username, 1, title, '', content, Date.now(), 0);
+				addAuthor(req.user.username, 1, title, '', content, Date.now(), 0, tags);
 			}
 		}
 	} else {
@@ -338,9 +342,25 @@ exports.postInfo = function(req, res) {
 	var authorID = sanitize(req.params.authorID).replace(/[^a-z0-9]/gi,'');
 	if(authorID.length == 24) {
 		var Author = mongoose.model('Author');
-		Author.findOne({'_id': authorID}).select('_id username type title image tags edit upvote downvote').exec(function(err, authorResult) {
+		Author.findOne({'_id': authorID}).select('_id username type title date image tags edit upvote downvote').exec(function(err, authorResult) {
 			if(err || authorResult == '' || authorResult == '[]' || authorResult == '{}' || authorResult == null) {
 				res.send('no post');
+			} else {
+				res.send(authorResult);
+			}
+		});
+	} else {
+		res.redirect('/404');
+	}
+}
+
+exports.postTags = function(req, res) {
+	var authorID = sanitize(req.params.authorID).replace(/[^a-z0-9]/gi,'');
+	if(authorID.length == 24) {
+		var Tags = mongoose.model('Tags');
+		Tags.find({'postID': authorID}).exec(function(err, authorResult) {
+			if(err || authorResult == '' || authorResult == '[]' || authorResult == '{}' || authorResult == null) {
+				res.send('no tags');
 			} else {
 				res.send(authorResult);
 			}

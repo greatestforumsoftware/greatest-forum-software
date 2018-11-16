@@ -250,6 +250,23 @@
 				color: #aaa;
 			}
 
+			#tags {
+				width: 100%;
+			}
+			#tags a {
+				color: #fff;
+			}
+			#tags a li {
+				background-color: #ddd;
+				float: left;
+				list-style-type: none;
+				margin-right: 10px;
+				padding: 0px 5px 2px;
+				border: 1px solid #ddd;
+				font-size: 0.8em;
+				font-family: sans-serif;
+			} 
+
 
 
 	</style>
@@ -339,16 +356,8 @@
 					<br>
 					<br>
 					<hr>
-					<div class='tag'>
-						<a href=''>
-							#money
-						</a>
-					</div>
-					<div class='tag'>
-						<a href=''>
-							#currency
-						</a>
-					</div>
+					<div class='tags'>
+					</div>	
 					<hr>
 					<p id='footer'>
 						<a href=''>Help</a> | <a href=''>Contact</a> | &copy;
@@ -378,13 +387,45 @@
 
 		<script type='text/javascript'>
 
+			function recentTags() {
+				$.get('/api/tags/recent', function(callback) {
+					if(callback == 'no result') {
+						return 0;
+					} else {
+						for (var tag in callback) {
+							$('.tags').append("<div class='tag'><a href='/tags/"+callback[tag].tagName+"'>#"+callback[tag].tagName+"</a></div>");
+						}
+						
+					}
+				});
+			}
+
+			recentTags();
+
 			function addPost(id, username) {
 				$.get('/post/'+id+'/commentscount', function(commentCount) {
-					$.get('/post/' + id + '/fullcontent', function(contentCallback) {
+					$.get('/post/' + id + '/brief', function(contentCallback) {
 						$.get('/api/'+username+'/user/brief', function(authorCallback) {
 							$.get('/post/'+id+'/info', function(infoCallback) {
-								var number = Number(infoCallback.upvote) - Number(infoCallback.downvote);
-								$('#articles').append("<article id='"+id+"'> <div id='wrapper'> <h4>"+infoCallback.title+"</h4> <div id='author'><p><img src='' /> @<a href='/profile/"+authorCallback.username+"'>"+authorCallback.username+"</a>, "+authorCallback.biography+"</p></div> <div id='contents'>"+contentCallback.contents+" <a href='/post/"+contentCallback._id+"'>...more</a></div> <div id='menu'> <ul> <li> "+commentCount+" <img src='/img/comment.png' /> </li> <li> "+number+" <img src='/img/star.png' /> </li> <a href='/post/"+id+"'> <li> <img src='/img/share.png' /> Link </li> </a> <li> <img src='/img/report.png' /> Report </li> </ul> </div> </div> </article>");
+								$.get('/post/'+id+'/tags', function(callbackTags) {
+									var number = Number(infoCallback.upvote) - Number(infoCallback.downvote);
+									if(contentCallback.length < 1) {
+										$('#articles').append("<article id='"+id+"'> <div id='wrapper'> <h4>"+infoCallback.title+"</h4> <div id='author'><p><img src='' /> @<a href='/profile/"+authorCallback.username+"'>"+authorCallback.username+"</a>, "+authorCallback.biography+"</p></div> <div id='contents'></div><div id='tags'></div><div id='menu'> <ul> <li> "+commentCount+" <img src='/img/comment.png' /> </li> <li> "+number+" <img src='/img/star.png' /> </li> <a href='/post/"+id+"'> <li> <img src='/img/share.png' /> Link </li> </a> <li> <img src='/img/report.png' /> Report </li> <li> <img src='/img/calendar.png' /> "+infoCallback.date.slice(0,10)+" </li> </ul> </div> </div> </article>");
+									} else {
+										$('#articles').append("<article id='"+id+"'> <div id='wrapper'> <h4>"+infoCallback.title+"</h4> <div id='author'><p><img src='' /> @<a href='/profile/"+authorCallback.username+"'>"+authorCallback.username+"</a>, "+authorCallback.biography+"</p></div> <div id='contents'>"+contentCallback.contents+" <a href='/post/"+contentCallback._id+"'>...more</a></div><div id='tags'></div><div id='menu'> <ul> <li> "+commentCount+" <img src='/img/comment.png' /> </li> <li> "+number+" <img src='/img/star.png' /> </li> <a href='/post/"+id+"'> <li> <img src='/img/share.png' /> Link </li> </a> <li> <img src='/img/report.png' /> Report </li> <li> <img src='/img/calendar.png' /> "+infoCallback.date.slice(0,10)+" </li> </ul> </div> </div> </article>");
+									}
+									$.get('/api/'+callbackInfo.username+'/user/brief', function(callbackUser) {
+										$('#'+id+' #author').append('<p> <img src="" /> @<a href="/profile/'+callbackUser.username+'">'+callbackUser.username+'</a>, '+callbackUser.biography+'</p>');
+									});
+									if(callbackTags == 'no tags') {
+										return 0;
+									} else {
+										for(var tags in callbackTags) {
+											$('#'+callbackTags[tags]['postID']+' #tags').append('<a href="/tags/'+callbackTags[tags]['tagName']+'"><li>#'+callbackTags[tags]['tagName']+'</li></a>');
+										}
+										$('#'+callbackTags[tags]['postID']+' #tags').append('<br>');
+									}
+								});	
 							});
 						});
 					});

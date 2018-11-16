@@ -330,3 +330,19 @@ exports.userActivity = function(req, res) {
 		res.redirect('/404');
 	}
 }
+
+exports.referral = function(req, res) {
+	var username = sanitize(req.params.username).replace(/[^a-z0-9]/gi,'');
+	if(username) {
+		var User = mongoose.model('User');
+		User.count({'referral': username}).exec(function(err, userResult) {
+			if(err || userResult == '' || userResult == '[]' || userResult == '{}' || userResult == null) {
+				res.send(String(0));
+			} else {
+				res.send(userResult);
+			}
+		});
+	} else {
+		res.redirect('/404');
+	}
+}

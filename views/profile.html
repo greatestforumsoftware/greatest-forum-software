@@ -316,6 +316,23 @@
 			color: #aaa;
 		}
 
+		#tags {
+			width: 100%;
+		}
+		#tags a {
+			color: #fff;
+		}
+		#tags a li {
+			background-color: #ddd;
+			float: left;
+			list-style-type: none;
+			margin-right: 10px;
+			padding: 0px 5px 2px;
+			border: 1px solid #ddd;
+			font-size: 0.8em;
+			font-family: sans-serif;
+		} 
+
 	</style>
 
 		<header>
@@ -396,7 +413,7 @@
 						<p>
 							<strong>Joined: </strong> <%- profileJoined %>
 							<br>
-							<strong>Members referred: </strong> arse
+							<strong>Members referred: </strong> <span id='membersReferred'></span>
 							<br>
 							<strong>XP: </strong> <%- profileXP %>
 						</p>
@@ -430,15 +447,7 @@
 					<br>
 					<br>
 					<hr>
-					<div class='tag'>
-						<a href=''>
-							#money
-						</a>
-					</div>
-					<div class='tag'>
-						<a href=''>
-							#currency
-						</a>
+					<div class='tags'>
 					</div>
 					<hr>
 					<p id='footer'>
@@ -446,7 +455,7 @@
 					</p>
 				</div>
 
-        <div class="col-sm-12 col-lg-7">
+        		<div class="col-sm-12 col-lg-7">
 					<div id='commentWrapper'>
 
 					</div>
@@ -458,14 +467,44 @@
 		<br>
 
 		<script type='text/javascript'>
+
+			function recentTags() {
+				$.get('/api/tags/recent', function(callback) {
+					if(callback == 'no result') {
+						return 0;
+					} else {
+						for (var tag in callback) {
+							$('.tags').append("<div class='tag'><a href='/tags/"+callback[tag].tagName+"'>#"+callback[tag].tagName+"</a></div>");
+						}
+						
+					}
+				});
+			}
+
+			recentTags();
+			
 			function addPost(id) {
 				$.get('/post/'+id+'/brief', function(callbackBrief) {
 					$.get('/post/'+id+'/info', function(callbackInfo) {
-						var xp = Number(callbackInfo.upvote) - Number(callbackInfo.downvote);
-						$('#commentWrapper').append("<article id='"+id+"'> <div id='wrapper'> <h4>"+callbackInfo.title+"</h4> <div id='author'></div> <div id='contents'>"+callbackBrief+" <a href='/post/"+id+"'>...more</a> </div> <div id='menu'> <ul> <li> 0 <img src='/img/comment.png' /> </li> <li> "+xp+" <img src='/img/star.png' /> </li> <a href='/post/"+id+"'> <li> <img src='/img/share.png' /> Link </li> </a> <li> <img src='/img/report.png' /> Report </li> </ul> </div> </div> </article>");
-						$.get('/api/'+callbackInfo.username+'/user/brief', function(callbackUser) {
-							$('#'+id+' #author').append('<p> <img src="" /> @<a href="/profile/'+callbackUser.username+'">'+callbackUser.username+'</a>, '+callbackUser.biography+'</p>');
-						});
+						$.get('/post/'+id+'/tags', function(callbackTags) {
+							var xp = Number(callbackInfo.upvote) - Number(callbackInfo.downvote);
+							if(callbackBrief.length < 1) {
+								$('#commentWrapper').append("<article id='"+id+"'> <div id='wrapper'> <h4>"+callbackInfo.title+"</h4> <div id='author'></div> <div id='contents'></div><div id='tags'></div><div id='menu'><ul> <li> 0 <img src='/img/comment.png' /> </li> <li> "+xp+" <img src='/img/star.png' /> </li> <a href='/post/"+id+"'> <li> <img src='/img/share.png' /> Link </li> </a> <li> <img src='/img/report.png' /> Report </li> </ul> </div> </div> </article>");
+							} else {
+								$('#commentWrapper').append("<article id='"+id+"'> <div id='wrapper'> <h4>"+callbackInfo.title+"</h4> <div id='author'></div> <div id='contents'>"+callbackBrief+" <a href='/post/"+id+"'>...more</a> </div><div id='tags'></div><div id='menu'><ul> <li> 0 <img src='/img/comment.png' /> </li> <li> "+xp+" <img src='/img/star.png' /> </li> <a href='/post/"+id+"'> <li> <img src='/img/share.png' /> Link </li> </a> <li> <img src='/img/report.png' /> Report </li> </ul> </div> </div> </article>");
+							}
+							$.get('/api/'+callbackInfo.username+'/user/brief', function(callbackUser) {
+								$('#'+id+' #author').append('<p> <img src="" /> @<a href="/profile/'+callbackUser.username+'">'+callbackUser.username+'</a>, '+callbackUser.biography+'</p>');
+							});
+							if(callbackTags == 'no tags') {
+								return 0;
+							} else {
+								for(var tags in callbackTags) {
+									$('#'+callbackTags[tags]['postID']+' #tags').append('<a href="/tags/'+callbackTags[tags]['tagName']+'"><li>#'+callbackTags[tags]['tagName']+'</li></a>');
+								}
+								$('#'+callbackTags[tags]['postID']+' #tags').append('<br>');
+							}
+						});	
 					});
 				});
 			}
@@ -473,19 +512,33 @@
 			function addCommentPost(id) {
 				$.get('/comment/'+id+'/info', function(callbackInfo) {
 					$.get('/comment/'+id+'/short', function(callbackShort) {
-
 						$.get('/post/'+callbackInfo.authorID+'/brief', function(postBrief) {
 							$.get('/post/'+callbackInfo.authorID+'/info', function(postInfo) {
-								var xp = Number(postInfo.upvote) - Number(postInfo.downvote);
-								$('#commentWrapper').append("<article id='"+postInfo._id+"'> <div id='wrapper'> <h4>"+postInfo.title+"</h4> <div id='author'></div> <div id='contents'>"+postBrief+" <a href='/post/"+postInfo._id+"'>...more</a> </div> <div id='menu'> <ul> <li> 0 <img src='/img/comment.png' /> </li> <li> "+xp+" <img src='/img/star.png' /> </li> <a href='/post/"+postInfo._id+"'> <li> <img src='/img/share.png' /> Link </li> </a> <li> <img src='/img/report.png' /> Report </li> </ul> </div> </div> </article>");
+								$.get('/post/'+callbackInfo.authorID+'/tags', function(callbackTags) {
+									var xp = Number(postInfo.upvote) - Number(postInfo.downvote);
+									if(postBrief.length < 1) {
+										$('#commentWrapper').append("<article id='"+postInfo._id+"'> <div id='wrapper'> <h4>"+postInfo.title+"</h4> <div id='author'></div> <div id='contents'></div><div id='tags'></div><div id='menu'> <ul> <li> 0 <img src='/img/comment.png' /> </li> <li> "+xp+" <img src='/img/star.png' /> </li> <a href='/post/"+postInfo._id+"'> <li> <img src='/img/share.png' /> Link </li> </a> <li> <img src='/img/report.png' /> Report </li> <li> <img src='/img/calendar.png' /> "+postInfo.date.slice(0,10)+" </li> </ul> </div> </div> </article>");
+									} else {
+										$('#commentWrapper').append("<article id='"+postInfo._id+"'> <div id='wrapper'> <h4>"+postInfo.title+"</h4> <div id='author'></div> <div id='contents'>"+postBrief+" <a href='/post/"+postInfo._id+"'>...more</a> </div><div id='tags'></div><div id='menu'> <ul> <li> 0 <img src='/img/comment.png' /> </li> <li> "+xp+" <img src='/img/star.png' /> </li> <a href='/post/"+postInfo._id+"'> <li> <img src='/img/share.png' /> Link </li> </a> <li> <img src='/img/report.png' /> Report </li> <li> <img src='/img/calendar.png' /> "+postInfo.date.slice(0,10)+" </li> </ul> </div> </div> </article>");
+									}
+									
 
-								$.get('/api/'+postInfo.username+'/user/brief', function(callbackUser) {
-									$('#'+postInfo._id+' #author').append('<p> <img src="" /> @<a href="/profile/'+callbackUser.username+'">'+callbackUser.username+'</a>, '+callbackUser.biography+'</p>');
-									$.get('/api/'+callbackInfo.from+'/user/brief', function(commentUser) {
-										$('#'+postInfo._id).append("<div class='comments'> <div class='author'> <p> <img src='' /> @<a href='/profile/"+callbackInfo.from+"'>"+callbackInfo.from+"</a>, "+callbackInfo.biography+"</p> </div> <div class='wrapper'> <div class='contents'>"+callbackShort+" <a href='/comment/"+id+"'>...more</a> </div> </div> </div>");
+									$.get('/api/'+postInfo.username+'/user/brief', function(callbackUser) {
+										$('#'+postInfo._id+' #author').append('<p> <img src="" /> @<a href="/profile/'+callbackUser.username+'">'+callbackUser.username+'</a>, '+callbackUser.biography+'</p>');
+										$.get('/api/'+callbackInfo.from+'/user/brief', function(commentUser) {
+											$('#'+postInfo._id).append("<div class='comments'> <div class='author'> <p> <img src='' /> @<a href='/profile/"+callbackInfo.from+"'>"+callbackInfo.from+"</a>, "+callbackInfo.biography+"</p> </div> <div class='wrapper'> <div class='contents'>"+callbackShort+" <a href='/comment/"+id+"'>...more</a> </div> </div> </div>");
+										});
 									});
-								});
 
+									if(callbackTags == 'no tags') {
+										return 0;
+									} else {
+										for(var tags in callbackTags) {
+											$('#'+callbackTags[tags]['postID']+' #tags').append('<a href="/tags/'+callbackTags[tags]['tagName']+'"><li>#'+callbackTags[tags]['tagName']+'</li></a>');
+										}
+										$('#'+callbackTags[tags]['postID']+' #tags').append('<br>');
+									}
+								});	
 							});
 						});
 
@@ -507,6 +560,10 @@
 						}
 					}
 				}
+			});
+
+			$.get('/api/<%- profileUsername %>/referral', function(callback) {
+				$('#membersReferred').append(callback);
 			});
 		</script>
 

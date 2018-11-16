@@ -342,6 +342,24 @@
 				color: #aaa;
 			}
 
+			#tags {
+				height: 5px;
+				margin-top: 15px;
+				margin-bottom: 25px;
+			}
+			#tags a {
+				color: #fff;
+			}
+			#tags a li {
+				background-color: #ddd;
+				float: left;
+				list-style-type: none;
+				margin-right: 10px;
+				padding: 0px 5px 2px;
+				border: 1px solid #ddd;
+				font-size: 0.8em;
+				font-family: sans-serif;
+			} 
 
 	</style>
 
@@ -430,15 +448,7 @@
 					<br>
 					<br>
 					<hr>
-					<div class='tag'>
-						<a href=''>
-							#money
-						</a>
-					</div>
-					<div class='tag'>
-						<a href=''>
-							#currency
-						</a>
+					<div class='tags'>
 					</div>
 					<hr>
 					<p id='footer'>
@@ -477,6 +487,21 @@
 
 	<script type="text/javascript">
 
+		function recentTags() {
+			$.get('/api/tags/recent', function(callback) {
+				if(callback == 'no result') {
+					return 0;
+				} else {
+					for (var tag in callback) {
+						$('.tags').append("<div class='tag'><a href='/tags/"+callback[tag].tagName+"'>#"+callback[tag].tagName+"</a></div>");
+					}
+					
+				}
+			});
+		}
+
+		recentTags();
+
 		var comments = 10;
 
 		function removePost(id) {
@@ -498,11 +523,11 @@
 			$.get('/author/'+id+'/status', function(callback) {
 				<% if(user) { %>
 					if(callback == 'upvoted') {
-						$('article #voteButtons').append('<li><button id="upvoted" onclick="upvote("post", "'+'\''+ID+'\''+'")">Upvote</button></li> <li><button onclick="downvote("post", '+'\''+ID+'\''+')" id="downvote">Downvote</button></li>');
+						$('article #voteButtons').append('<li><button id="upvoted" onclick="upvote("post", "'+'\''+id+'\''+'")">Upvote</button></li> <li><button onclick="downvote("post", '+'\''+id+'\''+')" id="downvote">Downvote</button></li>');
 					} else if(callback == 'downvoted') {
-						$('article #voteButtons').append('<li><button id="upvote" onclick="upvote("post", "'+'\''+ID+'\''+'")">Upvote</button></li> <li><button onclick="downvote("post", '+'\''+ID+'\''+')" id="downvoted">Downvote</button></li>');
+						$('article #voteButtons').append('<li><button id="upvote" onclick="upvote("post", "'+'\''+id+'\''+'")">Upvote</button></li> <li><button onclick="downvote("post", '+'\''+id+'\''+')" id="downvoted">Downvote</button></li>');
 					} else {
-						$('article #voteButtons').append('<li><button id="upvote" onclick="upvote("post", "'+'\''+ID+'\''+'")">Upvote</button></li> <li><button onclick="downvote("post", '+'\''+ID+'\''+')" id="downvote">Downvote</button></li>');
+						$('article #voteButtons').append('<li><button id="upvote" onclick="upvote("post", "'+'\''+id+'\''+'")">Upvote</button></li> <li><button onclick="downvote("post", '+'\''+id+'\''+')" id="downvote">Downvote</button></li>');
 					}
 				<% } %>
 			});
@@ -513,27 +538,30 @@
 				var score = Number(callback.upvote) - Number(callback.downvote);
 
 				$.get('/post/<%- postID %>/commentscount', function(commentCount) {
-					$('article').append("<div id='wrapper'><h4 id='articleTitle'>"+callback.title+"</h4> <div id="+callback.username+" class='author'>  </div> <div id='mainContent'>  </div> <div id='menu'> <ul> <li> <img src='/img/comment.png' /> "+commentCount+" </li> <li id='points'> <img src='/img/star.png' /> "+score+"</li> <div id='voteButtons'> </div> <a href='/post/"+callback._id+"'> <li> <img src='/img/share.png' /> Link </li> </a> </ul> </div> </div> </article>");
+					$('article').append("<div id='wrapper'><h4 id='articleTitle'>"+callback.title+"</h4> <div id="+callback.username+" class='author'>  </div> <div id='mainContent'>  </div> <div id='tags'></div> <div id='menu'> <ul> <li> <img src='/img/comment.png' /> "+commentCount+" </li> <li id='points'> <img src='/img/star.png' /> "+score+"</li> <div id='voteButtons'> </div> <a href='/post/"+callback._id+"'> <li> <img src='/img/share.png' /> Link </li> </a> </ul> </div> </div> </article>");
 				});
 
-				authorInfo(callback.username);
+				var date = callback.date.slice(0,10);
+
+				authorInfo(callback.username, date);
 				getContent(callback._id);
 				getComments(callback._id, comments);
 				voteAuthorStatus(callback._id);
+				getTags(callback._id);
 			});
 		}
 
-		function authorInfo(username) {
+		function authorInfo(username, date) {
 			$.get('/api/'+username+'/user/brief', function(callback) {
 				$('#wrapper #'+username).append("<p><img src='' /> @<a href='/profile/"+callback.username+"'>"+callback.username+"</a>, "+callback.biography+"</p>");
 				<% if(user) { %>
 					if('<%- user.username %>' == username) {
-						$('article ul').append("<li> <img src='/img/edit.png' /> Edit </li> <li> <button onclick='removePost('"+'<%- postID %>'+"')'> <img src='/img/delete.png' /> Delete </button> </li> <li> <img src='/img/calendar.png' />01/01/1970 </li>");
+						$('article ul').append("<li> <img src='/img/edit.png' /> Edit </li> <li> <button onclick='removePost('"+'<%- postID %>'+"')'> <img src='/img/delete.png' /> Delete </button> </li> <li> <img src='/img/calendar.png' /> "+date+" </li>");
 					} else {
-						$('article ul').append("<li> <img src='/img/report.png' /> Report </li> <li> <img src='/img/calendar.png' /> 01/01/1970 </li>");
+						$('article ul').append("<li> <img src='/img/report.png' /> Report </li> <li> <img src='/img/calendar.png' /> "+date+" </li>");
 					}
 				<% } else { %>
-					$('article ul').append("<li> <img src='/img/calendar.png' />01/01/1970 </li>");
+					$('article ul').append("<li> <img src='/img/calendar.png' /> "+date+" </li>");
 				<% } %>
 			});
 		}
@@ -628,7 +656,17 @@
 			}
 		}
 
-
+		function getTags(id) {
+			$.get('/post/'+id+'/tags', function(callback) {
+				if(callback == 'no tags') {
+					return 0;
+				} else {
+					for(var tags in callback) {
+						$('#tags').append('<a href="/tags/'+callback[tags]['tagName']+'"><li>#'+callback[tags]['tagName']+'</li></a>');
+					}
+				}
+			});
+		}
 
 		postInfo();
 
